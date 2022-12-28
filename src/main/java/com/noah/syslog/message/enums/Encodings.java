@@ -2,7 +2,8 @@ package com.noah.syslog.message.enums;
 
 public enum Encodings {
 
-    UTF_8("UTF-8", "BOM");
+    UTF_8("UTF-8", "BOM"),
+    ANY("ANY", "");
 
     private String name;
     private String type;
@@ -22,8 +23,9 @@ public enum Encodings {
 
     public String use(String message) {
         switch (this.name) {
-            case "UTF-8":
-            default: return this.type + " " + message;
+            case "UTF-8": return this.type + " " + message;
+            case "ANY":
+            default: return message;
         }
     }
 

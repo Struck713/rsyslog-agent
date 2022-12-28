@@ -10,13 +10,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.13.2'
-}
-
-test {
-    useJUnitPlatform()
-
-    testLogging {
-        events "passed"
-    }
+    implementation 'org.dblock.log4jna:log4jna:2.1.0';
+    implementation 'org.apache.log4jna:Win32EventLogAppender:2.1.0@dll';
+    //implementation group: 'org.apache.log4jna', name: 'Win32EventLogAppender' version: '2.1.0', type: ''
 }

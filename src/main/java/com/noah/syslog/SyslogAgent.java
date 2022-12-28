@@ -8,8 +8,6 @@ import com.noah.syslog.message.enums.Severity;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Date;
 
 public class SyslogAgent {
@@ -21,22 +19,22 @@ public class SyslogAgent {
 
         System.out.println(structuredData);
 
-        Message message = new Message(
-                Priority.NTP.with(Severity.WARNING),
-                new Date(),
-                "myserver.com",
-                "su",
-                201,
-                32001,
-                //structuredData,
-                Encodings.UTF_8,
-                "'su root' failed on /dev/pts/7"
-        );
-
         SyslogClient client = new SyslogClient(InetAddress.getLocalHost(), 5555);
-        client.send(message);
-
-        System.out.println(message);
+        for (int i = 0; i < 10; i++) {
+            Message message = new Message(
+                    Priority.MAIL.with(Severity.ALERT),
+                    new Date(),
+                    "myserver.com",
+                    "su",
+                    i,
+                    32001,
+                    //structuredData,
+                    Encodings.ANY,
+                    "'su root' failed in process " + i
+            );
+            client.send(message);
+        }
+        client.close();
     }
 
 }
