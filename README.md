@@ -16,6 +16,6 @@ After building, you can run the project with:
   java -jar SyslogAgent.jar
 ```
 
-### Development
+## Development
 
 Syslog is based on the RFC5424 specification. Information on it can be found [here](  https://www.rfc-editor.org/rfc/rfc5424#section-6.1).
