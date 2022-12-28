@@ -11,9 +11,8 @@ repositories {
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/net.java.dev.jna/jna
     implementation 'net.java.dev.jna:jna-platform:5.12.1'
-
+    implementation 'com.google.code.gson:gson:2.10'
 }
 
 shadowJar {

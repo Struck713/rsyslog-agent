@@ -43,3 +43,4 @@ bin/
 
 ### Other ###
 *.jar
+config.json

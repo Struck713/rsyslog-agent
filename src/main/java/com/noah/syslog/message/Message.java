@@ -1,7 +1,7 @@
 package com.noah.syslog.message;
 
 import com.noah.syslog.message.enums.Encodings;
-import com.noah.syslog.util.StringUtils;
+import com.noah.syslog.util.StringUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -58,7 +58,7 @@ public class Message {
 
     @Override
     public String toString() {
-        return StringUtils.join(" ",
+        return StringUtil.join(" ",
                 "<" + this.priority + ">" + this.version,
                 DATE_FORMAT.format(this.timestamp),
                 this.hostname,

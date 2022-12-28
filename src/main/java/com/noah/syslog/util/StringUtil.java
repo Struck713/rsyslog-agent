@@ -1,6 +1,6 @@
 package com.noah.syslog.util;
 
-public class StringUtils {
+public class StringUtil {
 
     public static String join(String delim, String... strings) {
         StringBuilder builder = new StringBuilder();

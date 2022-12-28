@@ -3,7 +3,10 @@ package com.noah.syslog;
 import com.noah.syslog.message.Message;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 
 public class SyslogClient {
 
