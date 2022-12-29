@@ -1,32 +1,37 @@
 package com.noah.syslog.log;
 
-import com.noah.syslog.config.ConfigLog;
-import com.sun.jna.platform.win32.Advapi32Util;
+import com.noah.syslog.config.ConfigFilter;
+import com.noah.syslog.util.WindowsUtil;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 public class LogManager {
 
-    private ConfigLog config;
-    private List<Advapi32Util.EventLogIterator> iterators;
+    private List<WindowsUtil.EventLogIterator> iterators;
 
-    public LogManager(ConfigLog config) {
-        this.config = config;
-
+    public LogManager(List<ConfigFilter> filters) {
         this.iterators = new ArrayList<>();
-        this.config.getTypes().forEach(type -> iterators.add(new Advapi32Util.EventLogIterator(type)));
+        filters.stream().map(WindowsUtil.EventLogIterator::new).forEach(iterators::add);
     }
 
-    public List<LogRecord> next() {
-        return this.iterators.stream()
-                .filter(Iterator::hasNext)
-                .map(Iterator::next)
-                .filter(record -> this.config.getLevels().contains(record.getType()))
-                .map(LogRecord::of)
-                .collect(Collectors.toList());
+    public List<WindowsUtil.EventLogRecord> next() {
+        List<WindowsUtil.EventLogRecord> records = new ArrayList<>();
+        for (WindowsUtil.EventLogIterator iterator : this.iterators) {
+            if (!iterator.hasNext()) {
+                iterator.open();
+                continue;
+            }
+
+            while (iterator.hasNext()) {
+                WindowsUtil.EventLogRecord next = iterator.next();
+                if (iterator.filter(next.getType())) continue;
+                records.add(next);
+            }
+        }
+        return records;
     }
 
 }

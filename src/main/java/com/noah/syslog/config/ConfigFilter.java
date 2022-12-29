@@ -5,16 +5,17 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ConfigLog {
+public class ConfigFilter {
 
-    private List<String> types;
+    private String source;
     private List<String> levels;
 
     // non-stored JSON values
     private transient List<Advapi32Util.EventLogType> logLevels;
 
-    public List<String> getTypes() {
-        return this.types;
+
+    public String getSource() {
+        return this.source;
     }
 
     public List<Advapi32Util.EventLogType> getLevels() {

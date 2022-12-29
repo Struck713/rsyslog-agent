@@ -1,5 +1,7 @@
 package com.noah.syslog.message.enums;
 
+import com.sun.jna.platform.win32.Advapi32Util;
+
 public enum Severity {
 
     EMERGENCY(0, "Emergency"),
@@ -10,6 +12,17 @@ public enum Severity {
     NOTICE(5, "Notice"),
     INFORMATIONAL(6, "Informational"),
     DEBUG(7, "Debug");
+
+    public static Severity of(Advapi32Util.EventLogType type) {
+        switch (type) {
+            case AuditFailure:
+            case Error: return Severity.ERROR;
+            case Warning: return Severity.WARNING;
+            case AuditSuccess:
+            case Informational:
+            default: return Severity.INFORMATIONAL;
+        }
+    }
 
     private int id;
     private String name;

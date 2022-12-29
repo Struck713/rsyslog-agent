@@ -1,11 +1,22 @@
 {
+  "timeBetweenReads": 10000,
   "host": {
     "protocol": "UDP",
     "address": "127.0.0.1",
     "port": 514
   },
-  "log": {
-    "types": [ "Applications", "System" ],
-    "levels": [ "Error", "Warning" ]
-  }
+  "filters": [
+    {
+      "source": "Application",
+      "levels": [ "Warning", "Error" ]
+    },
+    {
+      "source": "Security",
+      "levels": [ "AuditFailure" ]
+    },
+    {
+      "source": "System",
+      "levels": [ "Warning", "Error" ]
+    }
+  ]
 }
