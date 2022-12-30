@@ -3,9 +3,10 @@ package com.noah.syslog.log.filters;
 import com.noah.syslog.util.WindowsUtil;
 import com.sun.jna.platform.win32.Advapi32Util;
 
-import java.util.Map;
-
 public class FilterSecurityLogins implements Filter {
+
+    public static final int LOGON_EVENT_ID = 4624;
+    public static final int LOGOFF_EVENT_ID = 4634;
 
     private String source;
 
@@ -14,9 +15,16 @@ public class FilterSecurityLogins implements Filter {
     }
 
     @Override
+    public String getSource() {
+        return this.source;
+    }
+
+    @Override
     public boolean filter(WindowsUtil.EventLogRecord record) {
-        if (this.source.equals("Security")) return true;
         if (record.getType() != Advapi32Util.EventLogType.AuditSuccess) return true;
+
+        int eventId = record.getStatusCode();
+        if (!(eventId == LOGOFF_EVENT_ID || eventId == LOGON_EVENT_ID)) return true;
 
         String[] strings = record.getStrings();
         if (strings == null) return true;

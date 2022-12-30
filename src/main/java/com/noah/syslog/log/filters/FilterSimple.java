@@ -15,10 +15,14 @@ public class FilterSimple implements Filter {
     public FilterSimple(String source, Map<String, Object> options) {
         this.source = source;
 
-        System.out.println(options);
         if (!options.containsKey("levels")) throw new RuntimeException("Invalid options for Simple filter");
         List<String> types = (List<String>)options.get("levels");
         this.levels = types.stream().map(Advapi32Util.EventLogType::valueOf).collect(Collectors.toList());
+    }
+
+    @Override
+    public String getSource() {
+        return this.source;
     }
 
     @Override

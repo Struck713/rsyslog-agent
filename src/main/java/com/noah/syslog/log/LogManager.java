@@ -3,7 +3,6 @@ package com.noah.syslog.log;
 import com.noah.syslog.config.ConfigFilter;
 import com.noah.syslog.log.filters.Filter;
 import com.noah.syslog.util.WindowsUtil;
-import com.sun.jna.platform.win32.Advapi32Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +28,17 @@ public class LogManager {
 
             while (iterator.hasNext()) {
                 WindowsUtil.EventLogRecord next = iterator.next();
-                if (this.filters.stream().anyMatch(filter -> filter.filter(next))) continue;
+                if (this.checkFilters(iterator, next)) continue;
                 records.add(next);
             }
         }
         return records;
+    }
+
+    public boolean checkFilters(WindowsUtil.EventLogIterator iterator, WindowsUtil.EventLogRecord record) {
+        return this.filters.stream()
+                .filter(filter -> filter.getSource().equalsIgnoreCase(iterator.getSource()))
+                .anyMatch(filter -> filter.filter(record));
     }
 
 }

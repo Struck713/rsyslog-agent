@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.noah.syslog.client.Client;
 import com.noah.syslog.client.UDPClient;
 import com.noah.syslog.config.Config;
-import com.noah.syslog.config.ConfigFilter;
 import com.noah.syslog.config.ConfigHost;
 import com.noah.syslog.log.LogManager;
 import com.noah.syslog.message.Message;

@@ -1,6 +1,5 @@
 package com.noah.syslog.util;
 
-import com.noah.syslog.config.ConfigFilter;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -130,6 +129,9 @@ public class WindowsUtil {
         public void remove() {
         }
 
+        public String getSource() {
+            return _source;
+        }
     }
 
     /**

@@ -3,8 +3,6 @@ package com.noah.syslog.log.filters;
 import com.noah.syslog.config.ConfigFilter;
 import com.noah.syslog.util.WindowsUtil;
 
-import java.util.Map;
-
 public interface Filter {
 
     static Filter of(ConfigFilter filter) {
@@ -17,6 +15,7 @@ public interface Filter {
         }
     }
 
+    String getSource();
     boolean filter(WindowsUtil.EventLogRecord record);
 
 }
