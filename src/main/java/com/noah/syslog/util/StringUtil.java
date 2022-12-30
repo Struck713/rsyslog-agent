@@ -8,4 +8,8 @@ public class StringUtil {
         return builder.substring(0, builder.length() - delim.length());
     }
 
+    public static int countOctets(String string) {
+        return string.getBytes().length; // octet is 8 bits, a byte is 8 bits. byte count is the same as octet count
+    }
+
 }
