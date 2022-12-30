@@ -2,6 +2,8 @@ package com.noah.syslog;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.noah.syslog.client.Client;
+import com.noah.syslog.client.UDPClient;
 import com.noah.syslog.config.Config;
 import com.noah.syslog.config.ConfigHost;
 import com.noah.syslog.config.ConfigFilter;
@@ -29,7 +31,7 @@ public class SyslogAgent {
         Config config = SyslogAgent.loadConfig();
 
         ConfigHost host = config.getHost();
-        SyslogClient client = new SyslogClient(host.getInetAddress(), host.getPort());
+        Client client = new UDPClient(host.getInetAddress(), host.getPort());
 
         List<ConfigFilter> filters = config.getFilters();
         LogManager logManager = new LogManager(filters);
@@ -59,12 +61,8 @@ public class SyslogAgent {
                         message
                 );
             }).forEach(message -> {
-                try {
-                    client.send(message);
-                    System.out.println(message);
-                } catch (IOException e) {
-                    System.out.println("FAILED: " + e.getMessage());
-                }
+                client.send(message);
+                System.out.println(message);
             });
 
             Thread.sleep(timeBetweenReads);
