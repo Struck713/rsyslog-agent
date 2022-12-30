@@ -1,20 +1,22 @@
 package com.noah.syslog.log;
 
 import com.noah.syslog.config.ConfigFilter;
+import com.noah.syslog.log.filters.Filter;
 import com.noah.syslog.util.WindowsUtil;
+import com.sun.jna.platform.win32.Advapi32Util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 public class LogManager {
 
     private List<WindowsUtil.EventLogIterator> iterators;
+    private List<Filter> filters;
 
-    public LogManager(List<ConfigFilter> filters) {
-        this.iterators = new ArrayList<>();
-        filters.stream().map(WindowsUtil.EventLogIterator::new).forEach(iterators::add);
+    public LogManager(List<String> sources, List<ConfigFilter> filters) {
+        this.iterators = sources.stream().map(WindowsUtil.EventLogIterator::new).collect(Collectors.toList());
+        this.filters = filters.stream().map(Filter::of).collect(Collectors.toList());
     }
 
     public List<WindowsUtil.EventLogRecord> next() {
@@ -27,7 +29,7 @@ public class LogManager {
 
             while (iterator.hasNext()) {
                 WindowsUtil.EventLogRecord next = iterator.next();
-                if (iterator.filter(next.getType())) continue;
+                if (this.filters.stream().anyMatch(filter -> filter.filter(next))) continue;
                 records.add(next);
             }
         }

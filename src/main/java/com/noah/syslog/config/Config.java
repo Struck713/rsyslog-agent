@@ -6,6 +6,7 @@ public class Config {
 
     private long timeBetweenReads;
     private ConfigHost host;
+    private List<String> sources;
     private List<ConfigFilter> filters;
 
     public long getTimeBetweenReads() {
@@ -13,11 +14,9 @@ public class Config {
     }
 
     public ConfigHost getHost() { return this.host; }
-    public ConfigFilter getFilter(String source) {
-        return this.filters.stream()
-                .filter(filter -> filter.getSource().equalsIgnoreCase(source))
-                .findFirst()
-                .orElse(null);
+
+    public List<String> getSources() {
+        return this.sources;
     }
 
     public List<ConfigFilter> getFilters() {

@@ -1,7 +1,6 @@
 package com.noah.syslog.util;
 
 import com.noah.syslog.config.ConfigFilter;
-import com.noah.syslog.message.enums.Severity;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -9,7 +8,6 @@ import com.sun.jna.platform.win32.*;
 import com.sun.jna.ptr.IntByReference;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -33,11 +31,11 @@ public class WindowsUtil {
         // buffer
         private Pointer _pevlr = null; // pointer to the current record
         private int _flags;
-        private ConfigFilter _configFilter;
+        private String _source;
 
-        public EventLogIterator(ConfigFilter configFilter) {
+        public EventLogIterator(String source) {
             _flags = WinNT.EVENTLOG_FORWARDS_READ;
-            _configFilter = configFilter;
+            _source = source;
             this.open();
         }
 
@@ -47,7 +45,7 @@ public class WindowsUtil {
             _pevlr = null;
             _buffer.clear();
 
-            _h = Advapi32.INSTANCE.OpenEventLog(null, _configFilter.getSource());
+            _h = Advapi32.INSTANCE.OpenEventLog(null, _source);
             if (_h == null) {
                 throw new Win32Exception(Kernel32.INSTANCE.GetLastError());
             }
@@ -130,10 +128,6 @@ public class WindowsUtil {
 
         @Override
         public void remove() {
-        }
-
-        public boolean filter(Advapi32Util.EventLogType type) {
-            return !_configFilter.getLevels().contains(type);
         }
 
     }

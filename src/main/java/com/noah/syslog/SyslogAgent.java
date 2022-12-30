@@ -5,8 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.noah.syslog.client.Client;
 import com.noah.syslog.client.UDPClient;
 import com.noah.syslog.config.Config;
-import com.noah.syslog.config.ConfigHost;
 import com.noah.syslog.config.ConfigFilter;
+import com.noah.syslog.config.ConfigHost;
 import com.noah.syslog.log.LogManager;
 import com.noah.syslog.message.Message;
 import com.noah.syslog.message.enums.Encodings;
@@ -15,7 +15,6 @@ import com.noah.syslog.message.enums.Severity;
 import com.noah.syslog.util.FileUtil;
 import com.noah.syslog.util.OSUtil;
 import com.noah.syslog.util.WindowsUtil;
-import com.sun.jna.platform.win32.Advapi32Util;
 
 import java.io.*;
 import java.util.Arrays;
@@ -29,14 +28,12 @@ public class SyslogAgent {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         Config config = SyslogAgent.loadConfig();
+        LogManager logManager = new LogManager(config.getSources(), config.getFilters());
 
         ConfigHost host = config.getHost();
+        final String hostname = OSUtil.getName();
         Client client = new UDPClient(host.getInetAddress(), host.getPort());
-
-        List<ConfigFilter> filters = config.getFilters();
-        LogManager logManager = new LogManager(filters);
-
-        System.out.println("Sending UDP messages on " + host.getAddress() + ":" + host.getPort() + " hostname, " + OSUtil.getName());
+        System.out.println("Sending " + host.getProtocol() + " messages on " + host.getAddress() + ":" + host.getPort() + " hostname, " + hostname);
 
         final long timeBetweenReads = config.getTimeBetweenReads();
         while (true) {
@@ -53,7 +50,7 @@ public class SyslogAgent {
                 return new Message(
                         Priority.LOG_ALERT.with(severity),
                         record.getDate(),
-                        OSUtil.getName(),
+                        hostname,
                         record.getSource(),
                         statusCode,
                         record.getRecordNumber(),

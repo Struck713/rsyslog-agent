@@ -1,29 +1,29 @@
 package com.noah.syslog.log.filters;
 
-import com.noah.syslog.message.Message;
 import com.noah.syslog.util.WindowsUtil;
 import com.sun.jna.platform.win32.Advapi32Util;
 
-import java.util.Arrays;
+import java.util.Map;
 
 public class FilterSecurityLogins implements Filter {
 
-    @Override
-    public String getName() {
-        return "UserLogin";
+    private String source;
+
+    FilterSecurityLogins(String source) {
+        this.source = source;
     }
 
     @Override
-    public String filter(String sourceName, WindowsUtil.EventLogRecord record) {
-        if (sourceName.equals("Security")) return null;
-        if (record.getType() != Advapi32Util.EventLogType.AuditSuccess) return null;
+    public boolean filter(WindowsUtil.EventLogRecord record) {
+        if (this.source.equals("Security")) return true;
+        if (record.getType() != Advapi32Util.EventLogType.AuditSuccess) return true;
 
         String[] strings = record.getStrings();
-        if (strings == null) return null;
+        if (strings == null) return true;
 
         String username = strings[1]; //username on login
         String workstationName = strings[2];
-        return username + " logged in to " + workstationName + ".";
+        return false;
     }
 
 }

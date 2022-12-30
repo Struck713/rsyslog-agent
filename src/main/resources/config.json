@@ -5,18 +5,26 @@
     "address": "127.0.0.1",
     "port": 514
   },
+  "sources": [ "Application", "Security", "System" ],
   "filters": [
     {
       "source": "Application",
-      "levels": [ "Warning", "Error" ]
+      "filter": "Simple",
+      "options": {
+        "levels": [ "Warning", "Error" ]
+      }
     },
     {
       "source": "Security",
-      "levels": [ "AuditFailure" ]
+      "filter": "Security Logins",
+      "options": {}
     },
     {
       "source": "System",
-      "levels": [ "Warning", "Error" ]
+      "filter": "Simple",
+      "options": {
+        "levels": [ "Warning", "Error" ]
+      }
     }
   ]
 }
