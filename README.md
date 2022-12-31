@@ -16,7 +16,6 @@ When building this, I wanted it to be:
 - Configurable
 - Open-source
 
-I believe that I have achieved those goals.
 ## Installation
 
 This project was written and tested using Java 8, you will need to have it installed if you want
