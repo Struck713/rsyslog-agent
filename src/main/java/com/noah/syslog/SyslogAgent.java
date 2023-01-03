@@ -14,6 +14,8 @@ import com.noah.syslog.message.enums.Severity;
 import com.noah.syslog.util.FileUtil;
 import com.noah.syslog.util.OSUtil;
 import com.noah.syslog.util.WindowsUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Arrays;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 public class SyslogAgent {
 
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static final Logger LOGGER = LoggerFactory.getLogger("SyslogAgent");
     public static final File CONFIG_FILE = new File("config.json");
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -32,7 +35,7 @@ public class SyslogAgent {
         ConfigHost host = config.getHost();
         final String hostname = OSUtil.getName();
         Client client = new UDPClient(host.getInetAddress(), host.getPort());
-        System.out.println("Sending " + host.getProtocol() + " messages on " + host.getAddress() + ":" + host.getPort() + " hostname, " + hostname);
+        SyslogAgent.LOGGER.info("Sending " + host.getProtocol() + " messages on " + host.getAddress() + ":" + host.getPort() + " hostname, " + hostname);
 
         final long timeBetweenReads = config.getTimeBetweenReads();
         while (true) {
@@ -58,7 +61,7 @@ public class SyslogAgent {
                 );
             }).forEach(message -> {
                 client.send(message);
-                System.out.println(message);
+                SyslogAgent.LOGGER.info(message.toString());
             });
 
             Thread.sleep(timeBetweenReads);
