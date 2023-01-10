@@ -6,19 +6,18 @@ import com.noah.syslog.client.Client;
 import com.noah.syslog.client.UDPClient;
 import com.noah.syslog.config.Config;
 import com.noah.syslog.config.ConfigHost;
-import com.noah.syslog.log.LogManager;
+import com.noah.syslog.log.LogItem;
+import com.noah.syslog.log.LogAdapter;
+import com.noah.syslog.log.adapter.LinuxAdapter;
+import com.noah.syslog.log.adapter.WindowsAdapter;
 import com.noah.syslog.message.Message;
 import com.noah.syslog.message.enums.Encodings;
-import com.noah.syslog.message.enums.Priority;
-import com.noah.syslog.message.enums.Severity;
 import com.noah.syslog.util.FileUtil;
 import com.noah.syslog.util.OSUtil;
-import com.noah.syslog.util.WindowsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,36 +29,39 @@ public class SyslogAgent {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         Config config = SyslogAgent.loadConfig();
-        LogManager logManager = new LogManager(config.getSources(), config.getFilters());
+        final long timeBetweenReads = config.getTimeBetweenReads();
 
+        LogAdapter logAdapter;
+
+        SyslogAgent.LOGGER.info("Detecting operating system..");
+        OSUtil.Types osType = OSUtil.getType();
+        if (osType == OSUtil.Types.WINDOWS) logAdapter = new WindowsAdapter(config.getSources(), config.getFilters());
+        else if (osType == OSUtil.Types.UNIX) logAdapter = new LinuxAdapter(timeBetweenReads, config.getSources(), config.getFilters());
+        else { SyslogAgent.LOGGER.info("Operating system, " + osType.name() + " is unsupported!"); return; }
+        SyslogAgent.LOGGER.info("Detected operating system: " + osType.name());
+
+        SyslogAgent.LOGGER.info("Initializing SyslogAgent..");
         ConfigHost host = config.getHost();
         final String hostname = OSUtil.getName();
         Client client = new UDPClient(host.getInetAddress(), host.getPort());
         SyslogAgent.LOGGER.info("Sending " + host.getProtocol() + " messages on " + host.getAddress() + ":" + host.getPort() + " hostname, " + hostname);
 
-        final long timeBetweenReads = config.getTimeBetweenReads();
         while (true) {
-            List<WindowsUtil.EventLogRecord> nextRecords = logManager.next();
+            List<LogItem> nextRecords = logAdapter.next();
             if (nextRecords.isEmpty()) continue;
 
-            nextRecords.stream().map(record -> {
-                String data = record.getStrings() == null ? "No data attached" : Arrays.toString(record.getStrings());
-                String source = record.getSource();
-                Severity severity = Severity.of(record.getType());
-                int statusCode = record.getStatusCode();
-
-                String message = severity.getName() + " from " + source + " with status code " + statusCode + ": " + data;
-                return new Message(
-                        Priority.LOG_ALERT.with(severity),
+            nextRecords.stream().map(record ->
+                new Message(
+                        record.getPriority().with(record.getSeverity()),
                         record.getDate(),
                         hostname,
-                        record.getSource(),
-                        statusCode,
-                        record.getRecordNumber(),
+                        record.getApplication(),
+                        record.getProcessId(),
+                        record.getMessageId(),
                         Encodings.ANY,
-                        message
-                );
-            }).forEach(message -> {
+                        record.getData()
+                )
+            ).forEach(message -> {
                 client.send(message);
                 SyslogAgent.LOGGER.info(message.toString());
             });
