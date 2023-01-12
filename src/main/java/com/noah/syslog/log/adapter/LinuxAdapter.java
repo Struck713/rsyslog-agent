@@ -1,5 +1,6 @@
 package com.noah.syslog.log.adapter;
 
+import com.google.gson.reflect.TypeToken;
 import com.noah.syslog.SyslogAgent;
 import com.noah.syslog.config.ConfigFilter;
 import com.noah.syslog.log.LogAdapter;
@@ -9,8 +10,11 @@ import com.noah.syslog.log.watcher.FileWatcher;
 import com.noah.syslog.log.watcher.FileWatcherListener;
 import com.noah.syslog.message.enums.Priority;
 import com.noah.syslog.message.enums.Severity;
+import com.noah.syslog.util.FileUtil;
+import com.noah.syslog.util.StringUtil;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -19,7 +23,8 @@ import java.util.stream.Collectors;
 
 public class LinuxAdapter implements LogAdapter, FileWatcherListener {
 
-    public static final SimpleDateFormat APACHE_DATE_FORMAT = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z");
+    public static final SimpleDateFormat APACHE_DATE_FORMAT = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ssZ");
+    public static final File STATES = new File("states.json");
 
     private FileWatcher watcher;
     private Map<File, Long> fileStates;
@@ -29,8 +34,15 @@ public class LinuxAdapter implements LogAdapter, FileWatcherListener {
     public LinuxAdapter(long interval, List<String> sources, List<ConfigFilter> filters) {
         this.watcher = new FileWatcher(interval, this);
         this.filters = filters.stream().map(Filter::of).collect(Collectors.toList());
-        this.fileStates = new HashMap<>();
         this.items = new ArrayList<>();
+
+        this.fileStates = new HashMap<>();
+        if (LinuxAdapter.STATES.exists()) {
+            String rawJson = FileUtil.read(LinuxAdapter.STATES);
+            Type mapType = new TypeToken<Map<String, Long>>() {}.getType();
+            Map<String, Long> stringsMap = SyslogAgent.GSON.fromJson(rawJson, mapType);
+            stringsMap.forEach((k, v) -> this.fileStates.put(new File(k), v));
+        }
 
         sources.stream()
             .map(File::new)
@@ -40,6 +52,8 @@ public class LinuxAdapter implements LogAdapter, FileWatcherListener {
                 return exists;
             })
             .forEach(this.watcher::watch);
+
+        this.watcher.start();
     }
 
     private int messageId = 0;
@@ -50,10 +64,10 @@ public class LinuxAdapter implements LogAdapter, FileWatcherListener {
         List<LogItem> logItems = new ArrayList<>();
         this.items.stream()
             .filter(item -> item.contains("404"))
-            .map(item -> item.split(" ")).forEach(list -> {
-
+            .map(item -> item.split(" "))
+            .forEach(list -> {
                 String ip = list[0];
-                String request = list[5] + list[6] + list[7];
+                String request = StringUtil.join(" ", list[5], list[6], list[7]);
                 String datePart1 = list[3];
                 String datePart2 = list[4];
                 String dateString = datePart1.substring(1) + datePart2.substring(0, datePart2.length() - 1);
@@ -88,7 +102,12 @@ public class LinuxAdapter implements LogAdapter, FileWatcherListener {
                 this.items.add(string);
                 read.getAndIncrement();
             });
-            this.fileStates.put(file, state + read.get());
+            long newState = read.get();
+            this.fileStates.put(file, state + newState);
+
+            SyslogAgent.LOGGER.info("Read " + newState + " new lines from: " + file.getAbsolutePath());
+            String rawStates = SyslogAgent.GSON.toJson(this.fileStates);
+            FileUtil.write(rawStates, LinuxAdapter.STATES);
         } catch (IOException e) {
             SyslogAgent.LOGGER.error("Failed to read from file: " + file.getName());
         }

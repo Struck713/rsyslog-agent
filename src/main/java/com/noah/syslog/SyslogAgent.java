@@ -35,10 +35,10 @@ public class SyslogAgent {
 
         SyslogAgent.LOGGER.info("Detecting operating system..");
         OSUtil.Types osType = OSUtil.getType();
+        SyslogAgent.LOGGER.info("Detected operating system: " + osType.name());
         if (osType == OSUtil.Types.WINDOWS) logAdapter = new WindowsAdapter(config.getSources(), config.getFilters());
         else if (osType == OSUtil.Types.UNIX) logAdapter = new LinuxAdapter(timeBetweenReads, config.getSources(), config.getFilters());
-        else { SyslogAgent.LOGGER.info("Operating system, " + osType.name() + " is unsupported!"); return; }
-        SyslogAgent.LOGGER.info("Detected operating system: " + osType.name());
+        else { SyslogAgent.LOGGER.error("Operating system, " + osType.name() + " is unsupported!"); return; }
 
         SyslogAgent.LOGGER.info("Initializing SyslogAgent..");
         ConfigHost host = config.getHost();
