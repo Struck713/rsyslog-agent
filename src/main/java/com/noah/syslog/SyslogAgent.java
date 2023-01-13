@@ -25,7 +25,7 @@ public class SyslogAgent {
 
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     public static final Logger LOGGER = LoggerFactory.getLogger("SyslogAgent");
-    public static final File CONFIG_FILE = new File("example-windows.json");
+    public static final File CONFIG_FILE = new File("config.json");
 
     public static void main(String[] args) throws IOException, InterruptedException {
         ConfigBase config = SyslogAgent.loadConfig();
