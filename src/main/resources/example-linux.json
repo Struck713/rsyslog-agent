@@ -1,0 +1,22 @@
+{
+  "timeBetweenReads": 10000,
+  "host": {
+    "protocol": "UDP",
+    "address": "127.0.0.1",
+    "port": 514
+  },
+  "sources": {
+    "/var/logs/test.log": "Apache"
+  },
+  "filters": [
+    {
+      "source": "test.log",
+      "filter": "Message Contains",
+      "options": {
+        "1": "404",
+        "2": "ERROR",
+        "3": "WARNING"
+      }
+    }
+  ]
+}

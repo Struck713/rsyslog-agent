@@ -1,9 +1,10 @@
 package com.noah.syslog.log.filters;
 
+import com.noah.syslog.util.OSUtil;
 import com.noah.syslog.util.WindowsUtil;
 import com.sun.jna.platform.win32.Advapi32Util;
 
-public class FilterSecurityLogins implements Filter {
+public class FilterSecurityLogins implements Filter<WindowsUtil.EventLogRecord> {
 
     public static final int LOGON_EVENT_ID = 4624;
     public static final int LOGOFF_EVENT_ID = 4634;
@@ -17,6 +18,11 @@ public class FilterSecurityLogins implements Filter {
     @Override
     public String getSource() {
         return this.source;
+    }
+
+    @Override
+    public OSUtil.Types getSupportedOS() {
+        return OSUtil.Types.WINDOWS;
     }
 
     @Override

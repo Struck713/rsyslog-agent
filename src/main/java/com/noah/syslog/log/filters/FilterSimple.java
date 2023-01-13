@@ -1,5 +1,6 @@
 package com.noah.syslog.log.filters;
 
+import com.noah.syslog.util.OSUtil;
 import com.noah.syslog.util.WindowsUtil;
 import com.sun.jna.platform.win32.Advapi32Util;
 
@@ -7,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class FilterSimple implements Filter {
+public class FilterSimple implements Filter<WindowsUtil.EventLogRecord> {
 
     private String source;
     private List<Advapi32Util.EventLogType> levels;
@@ -23,6 +24,11 @@ public class FilterSimple implements Filter {
     @Override
     public String getSource() {
         return this.source;
+    }
+
+    @Override
+    public OSUtil.Types getSupportedOS() {
+        return OSUtil.Types.WINDOWS;
     }
 
     @Override

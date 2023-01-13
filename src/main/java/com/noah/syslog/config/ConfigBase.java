@@ -1,12 +1,13 @@
 package com.noah.syslog.config;
 
 import java.util.List;
+import java.util.Map;
 
-public class Config {
+public class ConfigBase {
 
     private long timeBetweenReads;
     private ConfigHost host;
-    private List<String> sources;
+    private Map<String, String> sources;
     private List<ConfigFilter> filters;
 
     public long getTimeBetweenReads() {
@@ -15,7 +16,7 @@ public class Config {
 
     public ConfigHost getHost() { return this.host; }
 
-    public List<String> getSources() {
+    public Map<String, String> getSources() {
         return this.sources;
     }
 

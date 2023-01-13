@@ -6,11 +6,13 @@ import com.noah.syslog.log.LogAdapter;
 import com.noah.syslog.log.filters.Filter;
 import com.noah.syslog.message.enums.Priority;
 import com.noah.syslog.message.enums.Severity;
+import com.noah.syslog.util.OSUtil;
 import com.noah.syslog.util.WindowsUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class WindowsAdapter implements LogAdapter {
@@ -18,9 +20,12 @@ public class WindowsAdapter implements LogAdapter {
     private List<WindowsUtil.EventLogIterator> iterators;
     private List<Filter> filters;
 
-    public WindowsAdapter(List<String> sources, List<ConfigFilter> filters) {
-        this.iterators = sources.stream().map(WindowsUtil.EventLogIterator::new).collect(Collectors.toList());
-        this.filters = filters.stream().map(Filter::of).collect(Collectors.toList());
+    public WindowsAdapter(Map<String, String> sources, List<ConfigFilter> filters) {
+        this.iterators = sources.values().stream().map(WindowsUtil.EventLogIterator::new).collect(Collectors.toList());
+        this.filters = filters.stream()
+                .map(Filter::of)
+                .filter(type -> type.getSupportedOS() == OSUtil.Types.WINDOWS)
+                .collect(Collectors.toList());
     }
 
     public List<LogItem> next() {

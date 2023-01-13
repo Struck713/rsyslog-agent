@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.noah.syslog.client.Client;
 import com.noah.syslog.client.UDPClient;
-import com.noah.syslog.config.Config;
+import com.noah.syslog.config.ConfigBase;
 import com.noah.syslog.config.ConfigHost;
 import com.noah.syslog.log.LogItem;
 import com.noah.syslog.log.LogAdapter;
@@ -25,10 +25,10 @@ public class SyslogAgent {
 
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     public static final Logger LOGGER = LoggerFactory.getLogger("SyslogAgent");
-    public static final File CONFIG_FILE = new File("config.json");
+    public static final File CONFIG_FILE = new File("example-windows.json");
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        Config config = SyslogAgent.loadConfig();
+        ConfigBase config = SyslogAgent.loadConfig();
         final long timeBetweenReads = config.getTimeBetweenReads();
 
         LogAdapter logAdapter;
@@ -71,7 +71,7 @@ public class SyslogAgent {
 
     }
 
-    public static Config loadConfig() throws IOException {
+    public static ConfigBase loadConfig() throws IOException {
         if (!CONFIG_FILE.exists()) {
             InputStream configStream = SyslogAgent.class
                     .getClassLoader()
@@ -86,7 +86,7 @@ public class SyslogAgent {
         }
 
         String rawData = FileUtil.read(CONFIG_FILE);
-        return SyslogAgent.GSON.fromJson(rawData, Config.class);
+        return SyslogAgent.GSON.fromJson(rawData, ConfigBase.class);
     }
 
 }

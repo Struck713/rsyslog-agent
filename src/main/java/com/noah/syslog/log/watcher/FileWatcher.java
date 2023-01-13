@@ -13,13 +13,6 @@ import java.io.FileFilter;
 
 public class FileWatcher {
 
-    private static final FileFilter FILTER = new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-            return pathname.getName().endsWith(".log");
-        }
-    };
-
     private FileAlterationMonitor monitor;
     private FileWatcherListener listener;
 
@@ -30,15 +23,23 @@ public class FileWatcher {
 
     public void watch(File file) {
         SyslogAgent.LOGGER.info("File watcher was started for: " + file.getAbsolutePath());
-        FileAlterationObserver observer = new FileAlterationObserver(file, FileWatcher.FILTER);
+        File directory = file.getParentFile();
+        FileAlterationObserver observer = new FileAlterationObserver(directory, new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.getName().contentEquals(file.getName());
+            }
+        });
+
         observer.addListener(new FileAlterationListenerAdaptor() {
             @Override
             public void onFileChange(File file) {
                 listener.onFileChange(file);
             }
         });
+
         this.monitor.addObserver(observer);
-        for (File item : file.listFiles(FileWatcher.FILTER)) this.listener.onFileChange(item);
+        this.listener.onFileChange(file);
     }
 
     public void stop() {

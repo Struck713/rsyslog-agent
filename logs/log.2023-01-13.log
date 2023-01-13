@@ -1,0 +1,6 @@
+13:17:48.769 [main] INFO  SyslogAgent - Detecting operating system..
+13:17:48.773 [main] INFO  SyslogAgent - Detected operating system: WINDOWS
+15:32:56.217 [main] INFO  SyslogAgent - Detecting operating system..
+15:32:56.221 [main] INFO  SyslogAgent - Detected operating system: WINDOWS
+15:32:56.814 [main] INFO  SyslogAgent - Initializing SyslogAgent..
+15:32:56.835 [main] INFO  SyslogAgent - Sending UDP messages on 127.0.0.1:514 hostname, ITLAPTOP
