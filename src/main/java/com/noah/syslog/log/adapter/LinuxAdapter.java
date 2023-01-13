@@ -26,8 +26,8 @@ public class LinuxAdapter implements LogAdapter, FileWatcherListener {
 
     public static final File STATES = new File("states.json");
 
-    private final Parser parser = new ApacheParser();
     private FileWatcher watcher;
+    private Map<String, Parser> parsers;
     private Map<File, Long> fileStates;
     private List<Pair<String, String>> items;
     private List<Filter> filters;
@@ -48,6 +48,7 @@ public class LinuxAdapter implements LogAdapter, FileWatcherListener {
             stringsMap.forEach((k, v) -> this.fileStates.put(new File(k), v));
         }
 
+        this.parsers = new HashMap<>();
         sources.forEach((k, v) -> {
             File file = new File(k);
             if (!file.exists()) {
@@ -61,6 +62,7 @@ public class LinuxAdapter implements LogAdapter, FileWatcherListener {
                 return;
             }
 
+            this.parsers.put(file.getName(), type);
             this.watcher.watch(file);
         });
 
@@ -69,7 +71,7 @@ public class LinuxAdapter implements LogAdapter, FileWatcherListener {
 
     public boolean checkFilters(String source, String item) {
         return this.filters.stream()
-                .filter(filter -> filter.getSource().equals(source))
+                .filter(filter -> filter.getSource().contentEquals(source))
                 .anyMatch(filter -> filter.filter(item));
     }
 
@@ -79,8 +81,7 @@ public class LinuxAdapter implements LogAdapter, FileWatcherListener {
         List<LogItem> logItems = new ArrayList<>();
         this.items.stream()
                 .filter(item -> this.checkFilters(item.getLeft(), item.getRight()))
-                .map(Pair::getRight)
-                .map(this.parser::parse)
+                .map(pair -> this.parsers.get(pair.getRight()).parse(pair.getLeft()))
                 .forEach(logItems::add);
         this.items.clear();
 

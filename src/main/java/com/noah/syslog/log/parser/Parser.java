@@ -5,10 +5,12 @@ import com.noah.syslog.log.LogItem;
 public interface Parser {
 
     Parser APACHE = new ApacheParser();
+    Parser TOMCAT = new TomcatParser();
 
     static Parser of(String name) {
         switch (name) {
-            case "Apache": return Parser.APACHE;
+            case "tomcat": return Parser.TOMCAT;
+            case "apache": return Parser.APACHE;
             default: return null;
         }
     }
