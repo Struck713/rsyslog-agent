@@ -1,0 +1,34 @@
+{
+  "timeBetweenReads": 10000,
+  "host": {
+    "protocol": "UDP",
+    "address": "127.0.0.1",
+    "port": 514
+  },
+  "sources": {
+    "Application": "event log",
+    "Security": "event log",
+    "System": "event log"
+  },
+  "filters": [
+    {
+      "source": "Application",
+      "filter": "Simple",
+      "options": {
+        "levels": [ "Warning", "Error" ]
+      }
+    },
+    {
+      "source": "Security",
+      "filter": "Security Logins",
+      "options": {}
+    },
+    {
+      "source": "System",
+      "filter": "Simple",
+      "options": {
+        "levels": [ "Warning", "Error" ]
+      }
+    }
+  ]
+}
