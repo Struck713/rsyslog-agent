@@ -20,3 +20,7 @@
 15:40:05.484 [main] INFO  SyslogAgent - Detected operating system: WINDOWS
 15:40:06.153 [main] INFO  SyslogAgent - Initializing SyslogAgent..
 15:40:06.174 [main] INFO  SyslogAgent - Sending UDP messages on 127.0.0.1:514 hostname, ITLAPTOP
+15:40:58.645 [main] INFO  SyslogAgent - Detecting operating system..
+15:40:58.649 [main] INFO  SyslogAgent - Detected operating system: WINDOWS
+15:40:59.247 [main] INFO  SyslogAgent - Initializing SyslogAgent..
+15:40:59.263 [main] INFO  SyslogAgent - Sending UDP messages on 127.0.0.1:514 hostname, ITLAPTOP

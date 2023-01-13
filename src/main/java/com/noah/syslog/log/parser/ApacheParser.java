@@ -26,6 +26,7 @@ public class ApacheParser implements Parser {
 
         String ip = items[0];
         String request = StringUtil.join(" ", items[5], items[6], items[7]);
+        String statusCode = items[8];
         String datePart1 = items[3];
         String datePart2 = items[4];
         String dateString = datePart1.substring(1) + datePart2.substring(0, datePart2.length() - 1);
@@ -38,18 +39,18 @@ public class ApacheParser implements Parser {
 
         return new LogItem(
                 date,
-                "apache",
+                this.getName(),
                 1,
                 messageId++,
                 Priority.LOG_ALERT,
                 Severity.ERROR,
-                "Tomcat threw a 404: " + ip + " submitted the request " + request
+                statusCode + ": " + ip + " submitted the request " + request
         );
     }
 
     @Override
     public String getName() {
-        return "Apache";
+        return "apache";
     }
 
 }
